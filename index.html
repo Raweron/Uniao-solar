@@ -144,13 +144,11 @@
         }, 5000);
 
         const apiKey = "AIzaSyAF0CDF1kEhwokhuF39TwJh_rufPjdbbBs"; 
-        
-        // Modelos ATUALIZADOS e compatíveis
         const modelList = ["gemini-1.5-flash", "gemini-1.5-pro"];
 
         const prompts = {
-            analyze: (input) => `Aja como Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique por que a limpeza profissional é necessária. Termine com o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Performance para: "${input}". Use: [DIAGNÓSTICO], [RISCOS] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Atue como Especialista da União Solar de Alegre/ES. Analise tecnicamente o problema: "${input}". Explique por que a limpeza profissional é necessária para evitar perdas financeiras. Termine com o zap (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Performance Técnica para: "${input}". Use os tópicos: [DIAGNÓSTICO TÉCNICO], [RISCO DE PERDA] e [PLANO DE ACÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -160,12 +158,12 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Por favor, descreva a situação da usina.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Por favor, descreva o estado da sua usina para análise.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "CONSULTANDO IA...";
+            resTitle.innerText = "IA EM CONSULTA...";
 
             let success = false;
             let errorMessage = "";
@@ -184,26 +182,26 @@
 
                     const data = await response.json();
 
-                    // ACESSO CORRETO AOS DADOS DA API GOOGLE
+                    // CORREÇÃO: Acedendo correctamente ao texto na estrutura da API Gemini
                     if (data && data.candidates && data.candidates && data.candidates.content) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
-                        resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
+                        resTitle.innerText = "ANÁLISE CONCLUÍDA";
                         success = true;
                     } else if (data.error) {
                         errorMessage = data.error.message;
                     }
                 } catch (e) {
-                    errorMessage = "Erro de rede.";
+                    errorMessage = "Erro de conexão com o servidor.";
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
                     <div class="text-center p-6 bg-red-950/20 rounded-2xl border border-red-500/30">
-                        <p class='text-red-400 font-bold mb-2 uppercase tracking-tighter'>Problema de Versão da API</p>
+                        <p class='text-red-400 font-bold mb-2 uppercase tracking-tighter'>Falha na Resposta</p>
                         <p class='text-[10px] text-slate-400 mb-4 italic'>Causa: ${errorMessage}</p>
-                        <p class='text-xs text-slate-300'>Atualizei o código para usar o Gemini 1.5. Se o erro persistir, o Google ainda não reconheceu o seu aceite de termos no AI Studio.</p>
+                        <p class='text-xs text-slate-300'>O Google pode estar a limitar o acesso. Tente novamente ou verifique se os termos no AI Studio foram aceites.</p>
                     </div>
                 `;
             }
@@ -218,7 +216,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Copiado!');
+            alert('Copiado com sucesso!');
         }
     </script>
 </body>
