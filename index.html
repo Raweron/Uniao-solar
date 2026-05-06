@@ -125,7 +125,7 @@
     </div>
 
     <script>
-        // Lógica do Slider de Textos
+        // Slider de Texto
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
             { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
@@ -144,12 +144,12 @@
             }
         }, 5000);
 
-        // --- SOLUÇÃO PARA API DO GEMINI ---
+        // --- INTEGRAÇÃO CORRIGIDA ---
         const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM"; 
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique a importância da limpeza profissional e os riscos de danos permanentes. Convide para o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos obrigatórios: [ANÁLISE TÉCNICA], [ESTIMATIVA DE PERDA] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Aja como o Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique a importância da limpeza técnica para evitar hotspots e perda de lucro. Convide para o zap (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [RISCOS DETECTADOS], [IMPACTO FINANCEIRO] e [SOLUÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -159,43 +159,71 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Por favor, digite uma descrição.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Digite algo para analisar.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "IA ANALISANDO...";
+            resTitle.innerText = "IA PROCESSANDO...";
 
             try {
-                // Endpoint corrigido com :generateContent
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                // TENTATIVA COM O MODELO FLASH-LATEST (MAIS ESTÁVEL)
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ 
-                            parts: [{ text: prompts[type](input) }] 
-                        }]
+                        contents: [{ parts: [{ text: prompts[type](input) }] }]
                     })
                 });
 
                 const data = await response.json();
                 
-                // CORREÇÃO DOS ÍNDICES: Agora está acessando corretamente a lista de candidatos
+                // CORREÇÃO DOS ACESSOS AOS ARRAYS
                 if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts) {
                     const text = data.candidates.content.parts.text;
                     output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
                     resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
+                } else if (data.error) {
+                    // Se o erro for de modelo não encontrado, tenta o modelo alternativo "gemini-pro"
+                    if (data.error.message.includes("not found")) {
+                        await tryAlternativeModel(type, input);
+                    } else {
+                        output.innerHTML = `<p class="text-red-400">Erro da API: ${data.error.message}</p>`;
+                    }
                 } else {
-                    const errorMsg = data.error ? data.error.message : "Erro na resposta. Verifique se a cota da sua API Key foi excedida.";
-                    output.innerHTML = `<p class="text-red-400">Erro: ${errorMsg}</p>`;
+                    output.innerHTML = `<p class="text-red-400">Resposta inválida da API.</p>`;
                 }
             } catch (e) {
-                console.error(e);
-                output.innerHTML = "<p class='text-red-500'>Falha na conexão com o servidor.</p>";
+                output.innerHTML = "<p class='text-red-500'>Erro de conexão com a rede.</p>";
             } finally {
                 loading.classList.add('hidden');
+            }
+        }
+
+        // Função de fallback caso o primeiro modelo falhe
+        async function tryAlternativeModel(type, input) {
+            const output = document.getElementById('ai-output');
+            const urlAlt = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+            
+            try {
+                const response = await fetch(urlAlt, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompts[type](input) }] }]
+                    })
+                });
+                const data = await response.json();
+                if (data && data.candidates && data.candidates) {
+                    const text = data.candidates.content.parts.text;
+                    output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
+                } else {
+                    output.innerHTML = `<p class="text-red-400">O modelo Gemini 1.5 Flash e o Pro não estão disponíveis para esta chave no momento.</p>`;
+                }
+            } catch(e) {
+                output.innerHTML = "<p class='text-red-500'>Erro crítico de acesso ao modelo.</p>";
             }
         }
 
