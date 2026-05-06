@@ -49,6 +49,7 @@
 
     <div id="app" class="relative min-h-screen bg-solar-dark flex flex-col items-center justify-start p-4 md:p-8 pb-40">
         
+        <!-- Cabeçalho -->
         <div class="w-full flex flex-col items-center z-30 slide-up mb-8">
             <div class="p-2 rounded-2xl max-w-[280px] md:max-w-[420px]">
                 <img src="logo-texto-branco.png" alt="União Solar Logo" onerror="this.src='https://via.placeholder.com/400x100/1e293b/f97316?text=UNIAO+SOLAR'" class="w-full h-auto object-contain filter drop-shadow-lg">
@@ -62,6 +63,7 @@
             </div>
         </div>
 
+        <!-- Mensagens Dinâmicas -->
         <div id="step-container" class="text-center max-w-4xl z-10 mb-12 min-h-[160px] transition-opacity duration-500">
             <h1 id="main-title" class="text-4xl md:text-7xl font-black mb-4 text-white leading-tight text-glow">
                 SUA USINA ESTÁ <br><span class="text-orange-500">PERDENDO DINHEIRO?</span>
@@ -71,6 +73,7 @@
             </p>
         </div>
 
+        <!-- Painel de IA -->
         <div class="w-full max-w-5xl z-20 slide-up grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-1 ai-card p-8 rounded-[2.5rem] shadow-2xl">
                 <div class="flex items-center space-x-2 mb-6">
@@ -110,6 +113,7 @@
             </div>
         </div>
 
+        <!-- WhatsApp -->
         <div class="fixed bottom-8 left-0 right-0 flex justify-center px-6 z-40">
             <a href="https://wa.me/5528998850813" target="_blank" class="bg-gradient-to-r from-green-600 to-green-500 text-white px-10 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-transform flex items-center space-x-4">
                 <div class="flex flex-col text-left">
@@ -121,7 +125,6 @@
     </div>
 
     <script>
-        // Lógica de Marketing
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
             { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e toda a região." }
@@ -140,15 +143,14 @@
             }
         }, 5000);
 
-        // --- INTEGRAÇÃO CORRIGIDA ---
         const apiKey = "AIzaSyAF0CDF1kEhwokhuF39TwJh_rufPjdbbBs"; 
         
-        // Modelos atualizados para 1.5 (os únicos suportados na v1beta atualmente)
+        // Modelos ATUALIZADOS e compatíveis
         const modelList = ["gemini-1.5-flash", "gemini-1.5-pro"];
 
         const prompts = {
-            analyze: (input) => `Aja como Especialista da União Solar de Alegre/ES. Analise tecnicamente o seguinte problema do cliente: "${input}". Explique por que a manutenção profissional é vital para o bolso dele. Termine convidando para o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Performance Solar para: "${input}". Use os títulos: [DIAGNÓSTICO], [RISCO TÉCNICO] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Aja como Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique por que a limpeza profissional é necessária. Termine com o zap (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Performance para: "${input}". Use: [DIAGNÓSTICO], [RISCOS] e [SOLUÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -158,12 +160,12 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Por favor, descreva a situação da sua usina.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Por favor, descreva a situação da usina.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "IA PROCESSANDO...";
+            resTitle.innerText = "CONSULTANDO IA...";
 
             let success = false;
             let errorMessage = "";
@@ -171,9 +173,7 @@
             for (const modelName of modelList) {
                 if (success) break;
                 try {
-                    // Endpoint v1beta atualizado
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-                    
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -184,6 +184,7 @@
 
                     const data = await response.json();
 
+                    // ACESSO CORRETO AOS DADOS DA API GOOGLE
                     if (data && data.candidates && data.candidates && data.candidates.content) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
@@ -191,19 +192,18 @@
                         success = true;
                     } else if (data.error) {
                         errorMessage = data.error.message;
-                        console.error("Erro no modelo " + modelName + ": " + errorMessage);
                     }
                 } catch (e) {
-                    errorMessage = "Falha de comunicação.";
+                    errorMessage = "Erro de rede.";
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
                     <div class="text-center p-6 bg-red-950/20 rounded-2xl border border-red-500/30">
-                        <p class='text-red-400 font-bold mb-2 uppercase tracking-tighter'>Erro de Modelo Técnico</p>
-                        <p class='text-[10px] text-slate-400 mb-4 italic'>${errorMessage}</p>
-                        <p class='text-xs text-slate-300'>O Google mudou os nomes dos modelos. Já atualizei o código para usar o Gemini 1.5. Tente novamente clicando no botão de análise.</p>
+                        <p class='text-red-400 font-bold mb-2 uppercase tracking-tighter'>Problema de Versão da API</p>
+                        <p class='text-[10px] text-slate-400 mb-4 italic'>Causa: ${errorMessage}</p>
+                        <p class='text-xs text-slate-300'>Atualizei o código para usar o Gemini 1.5. Se o erro persistir, o Google ainda não reconheceu o seu aceite de termos no AI Studio.</p>
                     </div>
                 `;
             }
@@ -218,7 +218,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Texto copiado!');
+            alert('Copiado!');
         }
     </script>
 </body>
