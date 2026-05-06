@@ -125,7 +125,7 @@
     </div>
 
     <script>
-        // Slider de Texto
+        // Lógica do Slider
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
             { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
@@ -144,12 +144,20 @@
             }
         }, 5000);
 
-        // --- INTEGRAÇÃO CORRIGIDA ---
+        // --- LÓGICA DE API BLINDADA ---
         const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM"; 
+        
+        // Modelos para tentar em ordem (Fallbacks)
+        const modelList = [
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+            "gemini-pro"
+        ];
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique a importância da limpeza técnica para evitar hotspots e perda de lucro. Convide para o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [RISCOS DETECTADOS], [IMPACTO FINANCEIRO] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente o seguinte relato: "${input}". Explique porque a manutenção preventiva e limpeza técnica são cruciais. Convide para o whatsapp (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Diagnóstico Solar profissional para: "${input}". Use os tópicos: [ANÁLISE DA SITUAÇÃO], [RISCOS TÉCNICOS] e [SOLUÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -159,72 +167,59 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Digite algo para analisar.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Por favor, descreva o problema da sua usina.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "IA PROCESSANDO...";
+            resTitle.innerText = "IA ANALISANDO...";
 
-            try {
-                // TENTATIVA COM O MODELO FLASH-LATEST (MAIS ESTÁVEL)
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompts[type](input) }] }]
-                    })
-                });
+            let success = false;
 
-                const data = await response.json();
+            for (const modelName of modelList) {
+                if (success) break;
                 
-                // CORREÇÃO DOS ACESSOS AOS ARRAYS
-                if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts) {
-                    const text = data.candidates.content.parts.text;
-                    output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
-                    resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
-                } else if (data.error) {
-                    // Se o erro for de modelo não encontrado, tenta o modelo alternativo "gemini-pro"
-                    if (data.error.message.includes("not found")) {
-                        await tryAlternativeModel(type, input);
-                    } else {
-                        output.innerHTML = `<p class="text-red-400">Erro da API: ${data.error.message}</p>`;
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompts[type](input) }] }]
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    // ACESSO CORRIGIDO AOS DADOS (USANDO ÍNDICES CORRETOS)
+                    if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts) {
+                        const text = data.candidates.content.parts.text;
+                        output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
+                        resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
+                        success = true;
+                    } else if (data.error) {
+                        console.warn(`Modelo ${modelName} falhou: ${data.error.message}`);
                     }
-                } else {
-                    output.innerHTML = `<p class="text-red-400">Resposta inválida da API.</p>`;
+                } catch (e) {
+                    console.error(`Erro crítico no modelo ${modelName}`);
                 }
-            } catch (e) {
-                output.innerHTML = "<p class='text-red-500'>Erro de conexão com a rede.</p>";
-            } finally {
-                loading.classList.add('hidden');
             }
-        }
 
-        // Função de fallback caso o primeiro modelo falhe
-        async function tryAlternativeModel(type, input) {
-            const output = document.getElementById('ai-output');
-            const urlAlt = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
-            
-            try {
-                const response = await fetch(urlAlt, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompts[type](input) }] }]
-                    })
-                });
-                const data = await response.json();
-                if (data && data.candidates && data.candidates) {
-                    const text = data.candidates.content.parts.text;
-                    output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
-                } else {
-                    output.innerHTML = `<p class="text-red-400">O modelo Gemini 1.5 Flash e o Pro não estão disponíveis para esta chave no momento.</p>`;
-                }
-            } catch(e) {
-                output.innerHTML = "<p class='text-red-500'>Erro crítico de acesso ao modelo.</p>";
+            if (!success) {
+                output.innerHTML = `
+                    <div class="text-center p-6 bg-slate-900/50 rounded-2xl border border-red-500/30">
+                        <p class='text-orange-500 font-bold mb-3'>Chave de API não autorizada para este modelo.</p>
+                        <p class='text-xs text-slate-400 leading-relaxed'>
+                            Para ativar, vá ao Google AI Studio, aceite os termos de uso e verifique se o modelo "Gemini 1.5 Flash" está visível.
+                        </p>
+                        <a href="https://aistudio.google.com/" target="_blank" class="mt-6 inline-block bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                            Ir ao Google AI Studio
+                        </a>
+                    </div>
+                `;
             }
+            
+            loading.classList.add('hidden');
         }
 
         function copyResponse() {
@@ -235,7 +230,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Copiado!');
+            alert('Copiado com sucesso!');
         }
     </script>
 </body>
