@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>União Solar - Performance Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-gold {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.3); }
+        }
+        .animate-gold { animation: pulse-gold 3s infinite ease-in-out; }
+        
+        .slide-up { animation: slideUp 0.8s ease-out forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bg-solar-dark {
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), 
+                        url('https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .ai-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white font-sans min-h-screen">
+
+    <div id="app" class="relative min-h-screen bg-solar-dark flex flex-col items-center justify-start p-4 md:p-8 pb-40">
+        
+        <!-- Header -->
+        <div class="w-full flex flex-col items-center z-30 slide-up mb-8">
+            <div class="p-2 rounded-2xl max-w-[280px] md:max-w-[420px]">
+                <img src="logo-texto-branco.png" alt="União Solar Logo" onerror="this.src='https://via.placeholder.com/400x100?text=Uniao+Solar+Logo'" class="w-full h-auto object-contain filter drop-shadow-lg">
+            </div>
+            <div class="mt-4 flex items-center space-x-3 bg-orange-600 text-white px-6 py-1.5 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-xl">
+                <span>Alegre</span>
+                <span class="opacity-50">•</span>
+                <span>Guaçuí</span>
+                <span class="opacity-50">•</span>
+                <span>Região</span>
+            </div>
+        </div>
+
+        <!-- Slider -->
+        <div id="step-container" class="text-center max-w-4xl z-10 mb-12 min-h-[160px] transition-opacity duration-500">
+            <h1 id="main-title" class="text-4xl md:text-7xl font-black mb-4 text-white leading-tight text-glow">
+                SUA USINA ESTÁ <br><span class="text-orange-500">PERDENDO DINHEIRO?</span>
+            </h1>
+            <p id="sub-title" class="text-lg md:text-2xl font-light text-slate-300 max-w-2xl mx-auto italic">
+                A sujeira invisível pode reduzir seu lucro em até <span class="text-orange-500 font-bold border-b-2 border-orange-500">30%</span>.
+            </p>
+        </div>
+
+        <!-- Painel de IA -->
+        <div class="w-full max-w-5xl z-20 slide-up grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 ai-card p-8 rounded-[2.5rem] shadow-2xl">
+                <div class="flex items-center space-x-2 mb-6">
+                    <span class="text-2xl animate-pulse">✨</span>
+                    <h3 class="font-bold text-orange-500 uppercase text-sm tracking-widest">Consultoria IA</h3>
+                </div>
+                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Descreva o estado das suas placas..."></textarea>
+                
+                <div class="space-y-4">
+                    <button onclick="runFeature('analyze')" id="btn-analyze" class="w-full bg-white text-slate-950 text-xs font-black py-4 rounded-xl hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center space-x-2 uppercase">
+                        <span>Análise de Eficiência</span>
+                    </button>
+                    <button onclick="runFeature('report')" id="btn-report" class="w-full bg-orange-600 text-white text-xs font-black py-4 rounded-xl hover:bg-orange-700 transition-all flex items-center justify-center space-x-2 uppercase">
+                        <span>Gerar Relatório</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 ai-card p-8 rounded-[2.5rem] shadow-2xl flex flex-col relative">
+                <div id="ai-loading" class="hidden absolute inset-0 bg-slate-900/80 backdrop-blur-md z-10 flex items-center justify-center rounded-[2.5rem]">
+                    <div class="flex flex-col items-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-orange-500 mb-4"></div>
+                        <span class="text-xs font-bold text-orange-500 uppercase tracking-[0.3em]">IA Analisando</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center mb-6">
+                    <h4 id="response-title" class="font-bold text-slate-500 uppercase text-[10px] tracking-[0.2em]">Diagnóstico Especializado</h4>
+                    <button onclick="copyResponse()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-[10px] font-bold text-orange-500 transition-colors">COPIAR</button>
+                </div>
+                
+                <div id="ai-output" class="text-sm md:text-lg text-slate-200 leading-relaxed custom-scrollbar overflow-y-auto flex-grow min-h-[280px]">
+                    <div class="flex flex-col items-center justify-center h-full text-center text-slate-500">
+                        <p class="max-w-xs">Insira os dados da sua usina ao lado para uma análise inteligente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rodapé WhatsApp -->
+        <div class="fixed bottom-8 left-0 right-0 flex justify-center px-6 z-40">
+            <a href="https://wa.me/5528998850813" target="_blank" class="bg-gradient-to-r from-green-600 to-green-500 text-white px-8 md:px-12 py-5 rounded-2xl shadow-[0_20px_50px_rgba(22,163,74,0.4)] hover:scale-105 transition-transform flex items-center space-x-4 border border-green-400/30">
+                <div class="flex flex-col text-left">
+                    <span class="text-[10px] font-black uppercase tracking-wider opacity-90">Falar com Especialista</span>
+                    <span class="text-xl md:text-3xl font-black leading-tight">(28) 99885-0813</span>
+                </div>
+                <div class="p-3 bg-white/10 rounded-xl">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.767 5.77 0 1.268.408 2.445 1.108 3.399l-.737 2.73 2.787-.731a5.746 5.746 0 002.609.623c3.181 0 5.767-2.586 5.767-5.77 0-3.184-2.586-5.771-5.767-5.771zm3.374 8.204c-.162.454-.84.856-1.132.917-.27.055-.594.082-1.685-.318-1.235-.452-2.03-1.741-2.092-1.824-.06-.082-.504-.67-.504-1.28 0-.61.32-.91.432-1.035.112-.125.244-.157.324-.157.082 0 .162 0 .232.003.076.003.18-.03.28.21.102.247.35.853.38.916.03.063.05.136.006.223-.043.087-.066.141-.131.218-.066.076-.138.172-.197.232-.066.071-.135.147-.059.278.076.128.337.556.723.899.497.442.916.58 1.05.643.131.063.208.053.284-.033.076-.087.327-.383.415-.512.087-.131.175-.109.294-.066.121.043.764.361.896.427.131.066.218.098.25.152.033.054.033.313-.129.767z"/></svg>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const title = document.getElementById('main-title');
+        const sub = document.getElementById('sub-title');
+        const container = document.getElementById('step-container');
+
+        const scenes = [
+            { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujeira invisível reduz seu lucro em até 30%." },
+            { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica profissional." },
+            { t: "UNIÃO SOLAR <br><span class='text-green-500'>SISTEMAS INTEGRADOS</span>", s: "Referência em Alegre, Guaçuí e região." }
+        ];
+
+        let idx = 0;
+        setInterval(() => {
+            idx = (idx + 1) % scenes.length;
+            if(container) container.style.opacity = 0;
+            setTimeout(() => {
+                if(title) title.innerHTML = scenes[idx].t;
+                if(sub) sub.innerHTML = scenes[idx].s;
+                if(container) container.style.opacity = 1;
+            }, 500);
+        }, 5000);
+
+        const apiKey = ""; 
+
+        const prompts = {
+            analyze: (input) => `Você é consultor da União Solar em Alegre-ES. Analise tecnicamente: "${input}". Foque em perda de eficiência e ROI. Seja persuasivo.`,
+            report: (input) => `Gere um relatório curto para: "${input}". Divida em Diagnóstico e Plano de Ação.`
+        };
+
+        async function runFeature(type) {
+            const input = document.getElementById('ai-input').value;
+            const output = document.getElementById('ai-output');
+            const loading = document.getElementById('ai-loading');
+            if (!input.trim()) return;
+
+            loading.classList.remove('hidden');
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: input }] }],
+                        systemInstruction: { parts: [{ text: prompts[type](input) }] }
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Correção da sintaxe de acesso às propriedades da API
+                let text = "Erro ao gerar resposta.";
+                if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts) {
+                    text = data.candidates.content.parts.text;
+                }
+                
+                output.innerHTML = `<div class="bg-slate-900/80 p-6 rounded-2xl border border-slate-700">${text.replace(/\n/g, '<br>')}</div>`;
+            } catch (e) {
+                output.innerHTML = "<p>Erro na conexão.</p>";
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function copyResponse() {
+            const text = document.getElementById('ai-output').innerText;
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('Copiado!');
+        }
+    </script>
+</body>
+</html>
