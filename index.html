@@ -52,7 +52,8 @@
         <!-- Cabeçalho -->
         <div class="w-full flex flex-col items-center z-30 slide-up mb-8">
             <div class="p-2 rounded-2xl max-w-[280px] md:max-w-[420px]">
-                <img src="logo-texto-branco.png" alt="União Solar Logo" onerror="this.src='https://via.placeholder.com/400x100?text=Uniao+Solar+Logo'" class="w-full h-auto object-contain filter drop-shadow-lg">
+                <!-- Tenta carregar a logo local, senão usa um placeholder visual -->
+                <img src="logo-texto-branco.png" alt="União Solar Logo" onerror="this.src='https://via.placeholder.com/400x100/1e293b/f97316?text=UNIAO+SOLAR'" class="w-full h-auto object-contain filter drop-shadow-lg">
             </div>
             <div class="mt-4 flex items-center space-x-3 bg-orange-600 text-white px-6 py-1.5 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-xl">
                 <span>Alegre</span>
@@ -80,7 +81,7 @@
                     <span class="text-2xl animate-pulse">✨</span>
                     <h3 class="font-bold text-orange-500 uppercase text-sm tracking-widest">Consultoria IA</h3>
                 </div>
-                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Ex: Minha conta de luz subiu muito, o que pode ser?"></textarea>
+                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Ex: Minha usina em Alegre está gerando menos que o normal..."></textarea>
                 
                 <div class="space-y-4">
                     <button onclick="runFeature('analyze')" id="btn-analyze" class="w-full bg-white text-slate-950 text-xs font-black py-4 rounded-xl hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center space-x-2 uppercase">
@@ -107,13 +108,13 @@
                 
                 <div id="ai-output" class="text-sm md:text-lg text-slate-200 leading-relaxed custom-scrollbar overflow-y-auto flex-grow min-h-[280px]">
                     <div class="flex flex-col items-center justify-center h-full text-center text-slate-500">
-                        <p class="max-w-xs italic opacity-40">Aguardando descrição para gerar o diagnóstico.</p>
+                        <p class="max-w-xs italic opacity-40">Aguardando detalhes para gerar o diagnóstico técnico.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- WhatsApp -->
+        <!-- WhatsApp Floating CTA -->
         <div class="fixed bottom-8 left-0 right-0 flex justify-center px-6 z-40">
             <a href="https://wa.me/5528998850813" target="_blank" class="bg-gradient-to-r from-green-600 to-green-500 text-white px-10 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-transform flex items-center space-x-4">
                 <div class="flex flex-col text-left">
@@ -125,10 +126,10 @@
     </div>
 
     <script>
-        // Lógica do Slider de Marketing
+        // Lógica de Alternância de Títulos (Marketing)
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
-            { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
+            { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e toda a região." }
         ];
         let idx = 0;
         setInterval(() => {
@@ -144,8 +145,9 @@
             }
         }, 5000);
 
-        // --- SISTEMA DE IA COM FALLBACKS ---
-        const apiKey = "AIzaSyAwgDvLz-4ireeuGNshd8gPDMauqCP0cqU"; 
+        // --- INTEGRAÇÃO COM GOOGLE GEMINI AI ---
+        // Usando a nova chave fornecida pelo utilizador
+        const apiKey = "AIzaSyAF0CDF1kEhwokhuF39TwJh_rufPjdbbBs"; 
         
         const modelList = [
             "gemini-1.5-flash",
@@ -153,8 +155,8 @@
         ];
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique porque a limpeza profissional é necessária. Convide para o whatsapp (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [ANÁLISE], [IMPACTO] e [SOLUÇÃO].`
+            analyze: (input) => `Aja como o Especialista Técnico Chefe da União Solar de Alegre/ES. Analise este caso: "${input}". Explique tecnicamente por que a manutenção profissional e a limpeza são cruciais para o rendimento. Seja profissional, mas direto. Termine convidando para o contacto (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Viabilidade e Performance para: "${input}". Use os tópicos: [DIAGNÓSTICO INICIAL], [RISCOS DETETADOS] e [RECOMENDAÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -164,16 +166,17 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Escreva os detalhes para analisar.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Por favor, introduza detalhes da sua usina ou as suas dúvidas.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "A LIGAR À IA...";
+            resTitle.innerText = "PROCESSANDO DIAGNÓSTICO...";
 
             let success = false;
             let lastError = "";
 
+            // Tenta os modelos em sequência caso um falhe por falta de permissão ou sobrecarga
             for (const modelName of modelList) {
                 if (success) break;
                 
@@ -189,31 +192,33 @@
 
                     const data = await response.json();
 
-                    // CORREÇÃO: Acesso aos dados com índice corrigido
+                    // Validação robusta da resposta
                     if (data && data.candidates && data.candidates && data.candidates.content) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
-                        resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
+                        resTitle.innerText = "RESULTADO DO CONSULTOR IA";
                         success = true;
                     } else if (data.error) {
                         lastError = data.error.message;
+                        console.warn(`Tentativa com ${modelName} falhou: ${lastError}`);
                     }
                 } catch (e) {
-                    console.error("Erro no modelo " + modelName);
+                    console.error("Erro de comunicação com o servidor de IA.");
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
                     <div class="text-center p-6 bg-slate-900/40 rounded-2xl border border-red-500/20">
-                        <p class='text-orange-500 font-bold mb-3 uppercase'>Chave não Autorizada</p>
-                        <p class='text-xs text-slate-400 mb-4'>
-                            Precisa de aceitar os Termos de Uso no Google AI Studio. 
-                            Dica: Tente enviar uma mensagem no CHAT do AI Studio para forçar o aviso.
+                        <p class='text-orange-500 font-bold mb-3 uppercase tracking-wider'>Chave em Processamento</p>
+                        <p class='text-xs text-slate-400 leading-relaxed mb-4'>
+                            A sua nova chave foi inserida, mas o Google pode demorar alguns minutos para ativá-la totalmente. 
+                            Certifique-se de que aceitou os termos no Google AI Studio.
                         </p>
-                        <a href="https://aistudio.google.com/" target="_blank" class="bg-orange-600 text-white font-bold py-3 px-8 rounded-xl text-xs uppercase inline-block">
-                            Abrir Google AI Studio
-                        </a>
+                        <p class='text-[9px] text-slate-600 mb-6 italic'>Log: ${lastError}</p>
+                        <button onclick="location.reload()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg text-xs uppercase tracking-widest">
+                            Tentar Novamente
+                        </button>
                     </div>
                 `;
             }
@@ -229,7 +234,15 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Copiado!');
+            // Notificação simples sem alert()
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "COPIADO!";
+            btn.classList.add("bg-orange-500", "text-white");
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove("bg-orange-500", "text-white");
+            }, 2000);
         }
     </script>
 </body>
