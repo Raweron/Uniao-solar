@@ -49,7 +49,7 @@
 
     <div id="app" class="relative min-h-screen bg-solar-dark flex flex-col items-center justify-start p-4 md:p-8 pb-40">
         
-        <!-- Header -->
+        <!-- Cabeçalho com Logo -->
         <div class="w-full flex flex-col items-center z-30 slide-up mb-8">
             <div class="p-2 rounded-2xl max-w-[280px] md:max-w-[420px]">
                 <img src="logo-texto-branco.png" alt="União Solar Logo" onerror="this.src='https://via.placeholder.com/400x100?text=Uniao+Solar+Logo'" class="w-full h-auto object-contain filter drop-shadow-lg">
@@ -130,7 +130,7 @@
     </div>
 
     <script>
-        // --- CONTROLE DE MENSAGENS ---
+        // --- CONTROLE DE MENSAGENS DO SLIDER ---
         const title = document.getElementById('main-title');
         const sub = document.getElementById('sub-title');
         const container = document.getElementById('step-container');
@@ -155,13 +155,11 @@
         }, 5000);
 
         // --- INTEGRAÇÃO REAL COM GEMINI API ---
-        // COLE SUA API KEY ABAIXO:
-        const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM  
-"; 
+        const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM"; 
 
         const prompts = {
-            analyze: (input) => `Aja como o Consultor Técnico da União Solar em Alegre-ES. Analise o seguinte relato: "${input}". Explique tecnicamente como o acúmulo de sujeira (módulos fotovoltaicos) causa perdas financeiras, mencione o risco de hotspots e por que a União Solar é a melhor escolha. Termine com o WhatsApp (28) 99885-0813.`,
-            report: (input) => `Crie um relatório estruturado de diagnóstico solar para: "${input}". Use os tópicos: [SITUAÇÃO ATUAL], [RISCOS TÉCNICOS] e [RECOMENDAÇÃO UNIÃO SOLAR]. Seja profissional e persuasivo.`
+            analyze: (input) => `Aja como o Consultor Técnico Especialista da União Solar (ES). Analise tecnicamente o seguinte relato do cliente: "${input}". Explique os danos que a falta de manutenção e limpeza causam nos painéis, os riscos de hotspots e a perda financeira imediata. Seja profissional e persuasivo, reforçando que a União Solar é a autoridade máxima em manutenção na região de Alegre e Guaçuí. Termine com o WhatsApp (28) 99885-0813.`,
+            report: (input) => `Gere um relatório estruturado de diagnóstico solar completo para: "${input}". Use obrigatoriamente os tópicos: [STATUS DO SISTEMA], [IMPACTO TÉCNICO E FINANCEIRO] e [SOLUÇÃO UNIÃO SOLAR]. Use linguagem técnica porém acessível. Finalize com os contatos da empresa.`
         };
 
         async function runFeature(type) {
@@ -171,41 +169,40 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500 font-bold'>Por favor, descreva seu problema ou sistema solar para começarmos a análise.</p>";
-                return;
-            }
-
-            if (!apiKey) {
-                output.innerHTML = "<p class='text-red-400 font-bold'>Erro: Chave de API não configurada. Por favor, insira sua API Key no código.</p>";
+                output.innerHTML = "<p class='text-orange-500 font-bold'>Por favor, descreva sua dúvida ou estado do sistema para iniciarmos.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "IA ANALISANDO...";
+            resTitle.innerText = "IA PROCESSANDO DIAGNÓSTICO...";
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: input }] }],
-                        systemInstruction: { parts: [{ text: prompts[type](input) }] }
+                        contents: [{ 
+                            parts: [{ text: prompts[type](input) }] 
+                        }]
                     })
                 });
 
                 const data = await response.json();
                 
-                let text = "Não foi possível gerar a resposta. Verifique sua conexão ou a Chave da API.";
+                // Extração do texto corrigida para o formato correto do Gemini API
+                let text = "Desculpe, não consegui processar a análise agora. Verifique a conexão.";
                 
-                if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts) {
+                if (data && data.candidates && data.candidates && data.candidates.content) {
                     text = data.candidates.content.parts.text;
+                } else if (data.error) {
+                    text = "Erro Técnico: " + data.error.message;
                 }
                 
-                output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 animate-gold">${text.replace(/\n/g, '<br>')}</div>`;
-                resTitle.innerText = type === 'analyze' ? "ANÁLISE DE EFICIÊNCIA" : "RELATÓRIO GERADO";
+                output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 animate-gold text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
+                resTitle.innerText = type === 'analyze' ? "ANÁLISE DE PERFORMANCE" : "RELATÓRIO TÉCNICO GERADO";
             } catch (e) {
                 console.error(e);
-                output.innerHTML = "<p class='text-red-500 font-bold'>Erro ao conectar com a Inteligência Artificial. Tente novamente.</p>";
+                output.innerHTML = "<p class='text-red-500 font-bold'>Erro de conexão com o servidor de IA.</p>";
             } finally {
                 loading.classList.add('hidden');
             }
@@ -219,7 +216,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('A análise foi copiada para sua área de transferência!');
+            alert('Copiado com sucesso!');
         }
     </script>
 </body>
