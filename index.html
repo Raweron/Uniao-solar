@@ -52,7 +52,6 @@
         <!-- Cabeçalho -->
         <div class="w-full flex flex-col items-center z-30 slide-up mb-8">
             <div class="p-2 rounded-2xl max-w-[280px] md:max-w-[420px]">
-                <!-- Placeholder para sua logo logo-texto-branco.png -->
                 <img src="logo-texto-branco.png" alt="União Solar Logo" onerror="this.src='https://via.placeholder.com/400x100?text=Uniao+Solar+Logo'" class="w-full h-auto object-contain filter drop-shadow-lg">
             </div>
             <div class="mt-4 flex items-center space-x-3 bg-orange-600 text-white px-6 py-1.5 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-xl">
@@ -64,7 +63,7 @@
             </div>
         </div>
 
-        <!-- Mensagens dinâmicas -->
+        <!-- Mensagens Dinâmicas -->
         <div id="step-container" class="text-center max-w-4xl z-10 mb-12 min-h-[160px] transition-opacity duration-500">
             <h1 id="main-title" class="text-4xl md:text-7xl font-black mb-4 text-white leading-tight text-glow">
                 SUA USINA ESTÁ <br><span class="text-orange-500">PERDENDO DINHEIRO?</span>
@@ -81,7 +80,7 @@
                     <span class="text-2xl animate-pulse">✨</span>
                     <h3 class="font-bold text-orange-500 uppercase text-sm tracking-widest">Consultoria IA</h3>
                 </div>
-                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Ex: Minha usina está gerando menos esse mês, o que pode ser?"></textarea>
+                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Ex: Minha conta de luz subiu. Pode ser sujeira nas placas?"></textarea>
                 
                 <div class="space-y-4">
                     <button onclick="runFeature('analyze')" id="btn-analyze" class="w-full bg-white text-slate-950 text-xs font-black py-4 rounded-xl hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center space-x-2 uppercase">
@@ -102,54 +101,55 @@
                 </div>
                 
                 <div class="flex justify-between items-center mb-6">
-                    <h4 id="response-title" class="font-bold text-slate-500 uppercase text-[10px] tracking-[0.2em]">Resultado da Inteligência Artificial</h4>
-                    <button onclick="copyResponse()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-[10px] font-bold text-orange-500 transition-colors">COPIAR RESPOSTA</button>
+                    <h4 id="response-title" class="font-bold text-slate-500 uppercase text-[10px] tracking-[0.2em]">Resultado União Solar IA</h4>
+                    <button onclick="copyResponse()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-[10px] font-bold text-orange-500 transition-colors">COPIAR</button>
                 </div>
                 
                 <div id="ai-output" class="text-sm md:text-lg text-slate-200 leading-relaxed custom-scrollbar overflow-y-auto flex-grow min-h-[280px]">
                     <div class="flex flex-col items-center justify-center h-full text-center text-slate-500">
-                        <p class="max-w-xs italic opacity-40">Aguardando sua pergunta para gerar o diagnóstico técnico União Solar.</p>
+                        <p class="max-w-xs italic opacity-40">Aguardando descrição para gerar diagnóstico.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Botão WhatsApp Fixo -->
+        <!-- WhatsApp -->
         <div class="fixed bottom-8 left-0 right-0 flex justify-center px-6 z-40">
-            <a href="https://wa.me/5528998850813" target="_blank" class="bg-gradient-to-r from-green-600 to-green-500 text-white px-8 md:px-12 py-5 rounded-2xl shadow-[0_20px_50px_rgba(22,163,74,0.4)] hover:scale-105 transition-transform flex items-center space-x-4 border border-green-400/30">
+            <a href="https://wa.me/5528998850813" target="_blank" class="bg-gradient-to-r from-green-600 to-green-500 text-white px-10 py-5 rounded-2xl shadow-2xl hover:scale-105 transition-transform flex items-center space-x-4">
                 <div class="flex flex-col text-left">
-                    <span class="text-[10px] font-black uppercase tracking-wider opacity-90">WhatsApp União Solar</span>
-                    <span class="text-xl md:text-3xl font-black leading-tight">(28) 99885-0813</span>
+                    <span class="text-[10px] font-black uppercase tracking-wider opacity-90">Falar no WhatsApp</span>
+                    <span class="text-xl md:text-2xl font-black">(28) 99885-0813</span>
                 </div>
             </a>
         </div>
     </div>
 
     <script>
-        // Logica de troca de textos
+        // Slider de Texto
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujeira invisível reduz seu lucro em até 30%." },
-            { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica especializada com foco em ROI." },
-            { t: "UNIÃO SOLAR <br><span class='text-green-500'>SISTEMAS INTEGRADOS</span>", s: "Referência em Alegre, Guaçuí e região do Caparaó." }
+            { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
         ];
         let idx = 0;
         setInterval(() => {
             idx = (idx + 1) % scenes.length;
-            const container = document.getElementById('step-container');
-            container.style.opacity = 0;
-            setTimeout(() => {
-                document.getElementById('main-title').innerHTML = scenes[idx].t;
-                document.getElementById('sub-title').innerHTML = scenes[idx].s;
-                container.style.opacity = 1;
-            }, 500);
+            const cont = document.getElementById('step-container');
+            if(cont) {
+                cont.style.opacity = 0;
+                setTimeout(() => {
+                    document.getElementById('main-title').innerHTML = scenes[idx].t;
+                    document.getElementById('sub-title').innerHTML = scenes[idx].s;
+                    cont.style.opacity = 1;
+                }, 500);
+            }
         }, 5000);
 
-        // --- INTEGRAÇÃO DEFINITIVA COM GEMINI API ---
+        // --- INTEGRAÇÃO CORRIGIDA ---
         const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM"; 
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise este caso: "${input}". Explique por que a manutenção técnica e a limpeza são vitais, os riscos de incêndio/hotspots por sujeira e a perda de lucro. Seja profissional e convide para o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Use obrigatoriamente os tópicos: [ANÁLISE DE RISCO], [PERDA ESTIMADA] e [RECOMENDAÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Aja como o Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique a importância da limpeza técnica para evitar hotspots e perda de lucro. Convide para o zap (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [RISCOS DETECTADOS], [IMPACTO FINANCEIRO] e [SOLUÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -159,42 +159,38 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Descreva seu problema para a IA analisar.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Digite algo para analisar.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "IA ANALISANDO SEU SISTEMA...";
+            resTitle.innerText = "PROCESSANDO...";
 
             try {
-                // CORREÇÃO: Usando a URL completa e correta para o modelo flash 1.5
+                // CORREÇÃO DEFINITIVA: URL do modelo estável gemini-1.5-flash
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ 
-                            parts: [{ text: prompts[type](input) }] 
-                        }]
+                        contents: [{ parts: [{ text: prompts[type](input) }] }]
                     })
                 });
 
                 const data = await response.json();
                 
-                // CORREÇÃO DE ACESSO: Caminho exato data.candidates.content.parts.text
-                if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts) {
+                // CORREÇÃO DE ACESSO AOS DADOS: Estrutura correta
+                if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts) {
                     const text = data.candidates.content.parts.text;
                     output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
+                    resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
                 } else {
-                    const errorMsg = data.error ? data.error.message : "Erro na resposta da IA.";
-                    output.innerHTML = `<p class="text-red-400">Erro: ${errorMsg}</p>`;
+                    const msg = data.error ? data.error.message : "Erro desconhecido na API.";
+                    output.innerHTML = `<p class="text-red-400">Erro técnico: ${msg}</p>`;
                 }
-
-                resTitle.innerText = type === 'analyze' ? "ANÁLISE DE PERFORMANCE" : "RELATÓRIO GERADO";
             } catch (e) {
-                console.error(e);
-                output.innerHTML = "<p class='text-red-500'>Erro ao conectar com a IA da União Solar.</p>";
+                output.innerHTML = "<p class='text-red-500'>Erro de conexão com a rede.</p>";
             } finally {
                 loading.classList.add('hidden');
             }
@@ -208,7 +204,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Copiado com sucesso!');
+            alert('Copiado!');
         }
     </script>
 </body>
