@@ -184,8 +184,8 @@
 
                     const data = await response.json();
 
-                    // CORREÇÃO CRÍTICA AQUI: Acesso correto aos campos da API
-                    if (data && data.candidates && data.candidates && data.candidates.content) {
+                    // FIX FINAL: Corrigido o acesso aos objetos aninhados da API do Google
+                    if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
                         resTitle.innerText = "DIAGNÓSTICO PRONTO";
@@ -194,17 +194,22 @@
                         errorMessage = data.error.message;
                     }
                 } catch (e) {
-                    errorMessage = "Erro de conexão.";
+                    errorMessage = "Erro de conexão com a API.";
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
                     <div class="text-center p-6 bg-red-950/20 rounded-2xl border border-red-500/30">
-                        <p class='text-red-400 font-bold mb-2'>A CHAVE AINDA NÃO FUNCIONOU</p>
-                        <p class='text-[10px] text-slate-400 mb-4'>Erro retornado: ${errorMessage}</p>
-                        <p class='text-xs text-slate-300 mb-4'>Vá ao AI Studio, clique na engrenagem (Settings) e aceite os termos em "Terms of Service".</p>
-                        <a href="https://aistudio.google.com/" target="_blank" class="bg-slate-800 text-white text-[10px] px-4 py-2 rounded-lg uppercase">Abrir AI Studio</a>
+                        <p class='text-red-400 font-bold mb-2 uppercase'>Bloqueio de Segurança do Google</p>
+                        <p class='text-[11px] text-slate-300 mb-4 italic'>Erro: ${errorMessage}</p>
+                        <p class='text-xs text-slate-300 mb-4'>
+                            A sua chave está correta, mas o Google exige que aceite os termos manualmente.
+                        </p>
+                        <div class="flex flex-col gap-2">
+                             <a href="https://aistudio.google.com/" target="_blank" class="bg-orange-600 text-white text-[10px] py-3 rounded-lg font-bold uppercase">1. Abrir AI Studio</a>
+                             <p class="text-[10px] text-slate-500">2. No AI Studio, clique em "+ New Prompt" e mande um "Oi" para forçar o aceite.</p>
+                        </div>
                     </div>
                 `;
             }
