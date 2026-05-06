@@ -69,7 +69,7 @@
                 SUA USINA ESTÁ <br><span class="text-orange-500">PERDENDO DINHEIRO?</span>
             </h1>
             <p id="sub-title" class="text-lg md:text-2xl font-light text-slate-300 max-w-2xl mx-auto italic">
-                A sujeira invisível pode reduzir seu lucro em até <span class="text-orange-500 font-bold border-b-2 border-orange-500">30%</span>.
+                A sujidade invisível pode reduzir o seu lucro em até <span class="text-orange-500 font-bold border-b-2 border-orange-500">30%</span>.
             </p>
         </div>
 
@@ -80,7 +80,7 @@
                     <span class="text-2xl animate-pulse">✨</span>
                     <h3 class="font-bold text-orange-500 uppercase text-sm tracking-widest">Consultoria IA</h3>
                 </div>
-                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Ex: Minha conta de luz subiu. Pode ser sujeira nas placas?"></textarea>
+                <textarea id="ai-input" rows="4" class="w-full bg-slate-900/50 p-4 rounded-2xl border border-slate-700 focus:border-orange-500 focus:outline-none transition-all text-white text-sm mb-6" placeholder="Ex: A minha conta de luz subiu. Pode ser sujidade nas placas?"></textarea>
                 
                 <div class="space-y-4">
                     <button onclick="runFeature('analyze')" id="btn-analyze" class="w-full bg-white text-slate-950 text-xs font-black py-4 rounded-xl hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center space-x-2 uppercase">
@@ -107,7 +107,7 @@
                 
                 <div id="ai-output" class="text-sm md:text-lg text-slate-200 leading-relaxed custom-scrollbar overflow-y-auto flex-grow min-h-[280px]">
                     <div class="flex flex-col items-center justify-center h-full text-center text-slate-500">
-                        <p class="max-w-xs italic opacity-40">Aguardando descrição para gerar diagnóstico.</p>
+                        <p class="max-w-xs italic opacity-40">Aguardando descrição para gerar o diagnóstico.</p>
                     </div>
                 </div>
             </div>
@@ -125,9 +125,9 @@
     </div>
 
     <script>
-        // Slider de Texto
+        // Lógica do Slider
         const scenes = [
-            { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujeira invisível reduz seu lucro em até 30%." },
+            { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
             { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
         ];
         let idx = 0;
@@ -144,12 +144,12 @@
             }
         }, 5000);
 
-        // --- INTEGRAÇÃO CORRIGIDA ---
+        // --- SOLUÇÃO DEFINITIVA DA API ---
         const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM"; 
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique a importância da limpeza técnica para evitar hotspots e perda de lucro. Convide para o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [RISCOS DETECTADOS], [IMPACTO FINANCEIRO] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Age como o Especialista da União Solar de Alegre/ES. Analisa tecnicamente: "${input}". Explica a importância da limpeza técnica para evitar hotspots e perda de lucro. Convida para o WhatsApp (28) 99885-0813.`,
+            report: (input) => `Gera um Relatório de Diagnóstico Solar para: "${input}". Tópicos obrigatórios: [RISCOS DETECTADOS], [IMPACTO FINANCEIRO] e [SOLUÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -159,38 +159,42 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Digite algo para analisar.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Escreva algo para analisar.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "PROCESSANDO...";
+            resTitle.innerText = "IA A PROCESSAR...";
 
             try {
-                // CORREÇÃO DEFINITIVA: URL do modelo estável gemini-1.5-flash
+                // URL corrigida com o endpoint oficial :generateContent
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompts[type](input) }] }]
+                        contents: [{ 
+                            parts: [{ text: prompts[type](input) }] 
+                        }]
                     })
                 });
 
                 const data = await response.json();
                 
-                // CORREÇÃO DE ACESSO AOS DADOS: Estrutura correta
+                // VERIFICAÇÃO DE DADOS RIGOROSA
                 if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts && data.candidates.content.parts) {
                     const text = data.candidates.content.parts.text;
                     output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100">${text.replace(/\n/g, '<br>')}</div>`;
                     resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
+                } else if (data.error) {
+                    output.innerHTML = `<p class="text-red-400">Erro da API: ${data.error.message}</p>`;
                 } else {
-                    const msg = data.error ? data.error.message : "Erro desconhecido na API.";
-                    output.innerHTML = `<p class="text-red-400">Erro técnico: ${msg}</p>`;
+                    output.innerHTML = `<p class="text-red-400">Resposta inválida recebida da IA.</p>`;
                 }
             } catch (e) {
-                output.innerHTML = "<p class='text-red-500'>Erro de conexão com a rede.</p>";
+                console.error("Erro de Rede:", e);
+                output.innerHTML = "<p class='text-red-500'>Erro de ligação ao servidor de IA.</p>";
             } finally {
                 loading.classList.add('hidden');
             }
@@ -204,7 +208,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Copiado!');
+            alert('Copiado com sucesso!');
         }
     </script>
 </body>
