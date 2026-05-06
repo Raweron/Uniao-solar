@@ -125,7 +125,7 @@
     </div>
 
     <script>
-        // Lógica do Slider
+        // Lógica do Slider de Marketing
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
             { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
@@ -144,19 +144,17 @@
             }
         }, 5000);
 
-        // --- SISTEMA DE IA COM FALLBACKS INTELIGENTES ---
+        // --- SISTEMA DE IA COM FALLBACKS ---
         const apiKey = "AIzaSyAwgDvLz-4ireeuGNshd8gPDMauqCP0cqU"; 
         
-        // Modelos em ordem de tentativa
         const modelList = [
             "gemini-1.5-flash",
-            "gemini-1.5-flash-latest",
             "gemini-pro"
         ];
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente este relato: "${input}". Explique porque a limpeza profissional é necessária para evitar perda de rendimento. Convide para o whatsapp (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [ANÁLISE DA SITUAÇÃO], [IMPACTO ESTIMADO] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique porque a limpeza profissional é necessária. Convide para o whatsapp (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Tópicos: [ANÁLISE], [IMPACTO] e [SOLUÇÃO].`
         };
 
         async function runFeature(type) {
@@ -166,12 +164,12 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Descreva os detalhes da sua usina para começar.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Escreva os detalhes para analisar.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "SISTEMA A ANALISAR...";
+            resTitle.innerText = "A LIGAR À IA...";
 
             let success = false;
             let lastError = "";
@@ -191,7 +189,7 @@
 
                     const data = await response.json();
 
-                    // VERIFICAÇÃO E ACESSO AOS DADOS (CORRIGIDO)
+                    // CORREÇÃO: Acesso aos dados com índice corrigido
                     if (data && data.candidates && data.candidates && data.candidates.content) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
@@ -199,25 +197,23 @@
                         success = true;
                     } else if (data.error) {
                         lastError = data.error.message;
-                        console.warn(`O modelo ${modelName} falhou: ${lastError}`);
                     }
                 } catch (e) {
-                    console.error(`Erro de conexão no modelo ${modelName}`);
+                    console.error("Erro no modelo " + modelName);
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
                     <div class="text-center p-6 bg-slate-900/40 rounded-2xl border border-red-500/20">
-                        <p class='text-orange-500 font-bold mb-3 uppercase tracking-wider'>Acesso Negado</p>
-                        <p class='text-xs text-slate-400 leading-relaxed mb-4'>
-                            A sua nova chave de API ainda não foi libertada para uso. 
-                            Geralmente demora de 1 a 5 minutos após a criação no Google AI Studio.
+                        <p class='text-orange-500 font-bold mb-3 uppercase'>Chave não Autorizada</p>
+                        <p class='text-xs text-slate-400 mb-4'>
+                            Precisa de aceitar os Termos de Uso no Google AI Studio. 
+                            Dica: Tente enviar uma mensagem no CHAT do AI Studio para forçar o aviso.
                         </p>
-                        <p class='text-[9px] text-slate-600 mb-6 italic'>Erro reportado: ${lastError}</p>
-                        <button onclick="location.reload()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg text-xs uppercase tracking-widest">
-                            Tentar Novamente
-                        </button>
+                        <a href="https://aistudio.google.com/" target="_blank" class="bg-orange-600 text-white font-bold py-3 px-8 rounded-xl text-xs uppercase inline-block">
+                            Abrir Google AI Studio
+                        </a>
                     </div>
                 `;
             }
@@ -233,7 +229,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Texto copiado com sucesso!');
+            alert('Copiado!');
         }
     </script>
 </body>
