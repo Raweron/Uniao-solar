@@ -149,8 +149,8 @@
         const modelList = ["gemini-1.5-flash", "gemini-pro"];
 
         const prompts = {
-            analyze: (input) => `Aja como Especialista da União Solar de Alegre/ES. Analise tecnicamente: "${input}". Explique por que a limpeza profissional é necessária. Termine com o zap (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Performance para: "${input}". Use: [DIAGNÓSTICO], [RISCOS] e [SOLUÇÃO UNIÃO SOLAR].`
+            analyze: (input) => `Aja como Especialista da União Solar de Alegre/ES. Analise tecnicamente o seguinte problema do cliente: "${input}". Explique por que a manutenção profissional é vital para o bolso dele. Termine convidando para o zap (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Performance Solar para: "${input}". Use os títulos: [DIAGNÓSTICO], [RISCO TÉCNICO] e [SOLUÇÃO UNIÃO SOLAR].`
         };
 
         async function runFeature(type) {
@@ -160,12 +160,12 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Introduza os detalhes da usina.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Por favor, descreva a situação da sua usina.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "CONSULTANDO IA...";
+            resTitle.innerText = "IA PROCESSANDO...";
 
             let success = false;
             let errorMessage = "";
@@ -184,31 +184,31 @@
 
                     const data = await response.json();
 
-                    // FIX FINAL: Corrigido o acesso aos objetos aninhados da API do Google
+                    // CORREÇÃO DOS ÍNDICES DE RESPOSTA DA API
                     if (data && data.candidates && data.candidates && data.candidates.content && data.candidates.content.parts) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
-                        resTitle.innerText = "DIAGNÓSTICO PRONTO";
+                        resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
                         success = true;
                     } else if (data.error) {
                         errorMessage = data.error.message;
                     }
                 } catch (e) {
-                    errorMessage = "Erro de conexão com a API.";
+                    errorMessage = "Falha de conexão com os servidores de IA.";
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
                     <div class="text-center p-6 bg-red-950/20 rounded-2xl border border-red-500/30">
-                        <p class='text-red-400 font-bold mb-2 uppercase'>Bloqueio de Segurança do Google</p>
-                        <p class='text-[11px] text-slate-300 mb-4 italic'>Erro: ${errorMessage}</p>
-                        <p class='text-xs text-slate-300 mb-4'>
-                            A sua chave está correta, mas o Google exige que aceite os termos manualmente.
+                        <p class='text-red-400 font-bold mb-2 uppercase tracking-tighter'>Acesso Negado pelo Google</p>
+                        <p class='text-[10px] text-slate-400 mb-4 italic'>Causa: ${errorMessage}</p>
+                        <p class='text-xs text-slate-300 mb-6'>
+                            A chave é válida, mas você precisa "destravar" o aceite de termos no seu perfil Google.
                         </p>
-                        <div class="flex flex-col gap-2">
-                             <a href="https://aistudio.google.com/" target="_blank" class="bg-orange-600 text-white text-[10px] py-3 rounded-lg font-bold uppercase">1. Abrir AI Studio</a>
-                             <p class="text-[10px] text-slate-500">2. No AI Studio, clique em "+ New Prompt" e mande um "Oi" para forçar o aceite.</p>
+                        <div class="space-y-3">
+                             <a href="https://aistudio.google.com/" target="_blank" class="block bg-white text-black font-bold py-3 rounded-xl text-[10px] uppercase">1. Abrir AI Studio</a>
+                             <p class="text-[10px] text-orange-500 font-medium">No AI Studio, clique em "+ New Prompt" e mande uma mensagem de teste para forçar o pop-up de termos.</p>
                         </div>
                     </div>
                 `;
@@ -224,7 +224,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Copiado!');
+            alert('Texto copiado para a área de transferência!');
         }
     </script>
 </body>
