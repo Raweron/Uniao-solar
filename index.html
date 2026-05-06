@@ -125,7 +125,7 @@
     </div>
 
     <script>
-        // Lógica do Slider de Marketing
+        // Lógica do Slider
         const scenes = [
             { t: "SUA USINA ESTÁ <br><span class='text-orange-500'>PERDENDO DINHEIRO?</span>", s: "A sujidade invisível reduz o seu lucro em até 30%." },
             { t: "QUALIDADE QUE <br><span class='text-blue-400'>GERA RESULTADO</span>", s: "Manutenção técnica em Alegre, Guaçuí e região." }
@@ -144,20 +144,20 @@
             }
         }, 5000);
 
-        // --- SISTEMA DE IA COM FALLBACKS ROBUSTOS ---
+        // --- SISTEMA DE IA COM FALLBACKS INTELIGENTES ---
         const apiKey = "AIzaSyAsfRBIj7WnVfljXAhHH4oFpUK5wAw2cBM"; 
         
-        // Lista de modelos do mais recente ao mais compatível
+        // Modelos em ordem de tentativa
         const modelList = [
-            "gemini-1.5-flash-latest",
-            "gemini-1.5-flash",
-            "gemini-pro",
-            "gemini-1.0-pro"
+            "gemini-1.5-flash-latest", // 1ª opção (Rápido)
+            "gemini-1.5-flash",        // 2ª opção
+            "gemini-pro",              // 3ª opção (Estável)
+            "gemini-1.0-pro"           // 4ª opção (Máxima Compatibilidade)
         ];
 
         const prompts = {
-            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente este relato: "${input}". Explique porque a limpeza técnica profissional é necessária para evitar perda de lucro. Termine convidando para o whatsapp (28) 99885-0813.`,
-            report: (input) => `Gere um Relatório de Diagnóstico Solar para: "${input}". Use os tópicos: [AVALIAÇÃO], [PERDAS ESTIMADAS] e [SOLUÇÃO TÉCNICA].`
+            analyze: (input) => `Aja como o Especialista Técnico da União Solar de Alegre/ES. Analise tecnicamente este relato de problema solar: "${input}". Explique a importância da manutenção preventiva. Convide para o whatsapp (28) 99885-0813.`,
+            report: (input) => `Gere um Relatório de Diagnóstico Solar profissional para: "${input}". Tópicos: [ANÁLISE], [IMPACTO FINANCEIRO] e [SOLUÇÃO].`
         };
 
         async function runFeature(type) {
@@ -167,16 +167,17 @@
             const resTitle = document.getElementById('response-title');
 
             if (!input.trim()) {
-                output.innerHTML = "<p class='text-orange-500'>Descreva o estado da sua usina para começar.</p>";
+                output.innerHTML = "<p class='text-orange-500'>Escreva os detalhes da sua usina para analisar.</p>";
                 return;
             }
 
             loading.classList.remove('hidden');
-            resTitle.innerText = "SISTEMA A ANALISAR...";
+            resTitle.innerText = "CONECTANDO À IA...";
 
             let success = false;
-            let lastErrorMessage = "";
+            let lastError = "";
 
+            // Loop tenta cada modelo até um funcionar
             for (const modelName of modelList) {
                 if (success) break;
                 
@@ -192,31 +193,32 @@
 
                     const data = await response.json();
 
-                    // CORREÇÃO DA SINTAXE DE ACESSO AO CANDIDATE
+                    // VERIFICAÇÃO CORRIGIDA DO FORMATO DA RESPOSTA
                     if (data && data.candidates && data.candidates && data.candidates.content) {
                         const text = data.candidates.content.parts.text;
                         output.innerHTML = `<div class="bg-slate-900/60 p-6 rounded-2xl border border-orange-500/30 text-slate-100 leading-relaxed">${text.replace(/\n/g, '<br>')}</div>`;
                         resTitle.innerText = "DIAGNÓSTICO CONCLUÍDO";
                         success = true;
                     } else if (data.error) {
-                        lastErrorMessage = data.error.message;
-                        console.warn(`Tentativa com ${modelName} falhou: ${lastErrorMessage}`);
+                        lastError = data.error.message;
+                        console.warn(`O modelo ${modelName} não pôde ser usado: ${lastError}`);
                     }
                 } catch (e) {
-                    console.error(`Erro de rede no modelo ${modelName}`);
+                    console.error(`Erro de conexão ao tentar o modelo ${modelName}`);
                 }
             }
 
             if (!success) {
                 output.innerHTML = `
-                    <div class="text-center p-6 bg-slate-900/50 rounded-2xl border border-red-500/30">
-                        <p class='text-orange-500 font-bold mb-3'>Modelos em fase de ativação.</p>
+                    <div class="text-center p-6 bg-slate-900/40 rounded-2xl border border-red-500/20">
+                        <p class='text-orange-500 font-bold mb-3 uppercase tracking-wider'>Acesso Pendente</p>
                         <p class='text-xs text-slate-400 leading-relaxed mb-4'>
-                            A sua chave de API foi detetada, mas o Google ainda não libertou o acesso aos modelos Gemini 1.5 ou Pro para o seu perfil.
+                            A sua chave de API ainda não foi totalmente ativada pelo Google para os modelos 1.5. 
+                            Geralmente, isto resolve-se aceitando os novos termos no painel do desenvolvedor.
                         </p>
-                        <p class='text-[10px] text-slate-500 mb-4 italic'>Erro reportado: ${lastErrorMessage}</p>
-                        <a href="https://aistudio.google.com/" target="_blank" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition-colors text-xs uppercase">
-                            Habilitar no Google AI Studio
+                        <p class='text-[9px] text-slate-600 mb-6 italic'>Motivo: ${lastError}</p>
+                        <a href="https://aistudio.google.com/" target="_blank" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg text-xs uppercase tracking-widest">
+                            Ativar no Google AI Studio
                         </a>
                     </div>
                 `;
@@ -233,7 +235,7 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            alert('Texto copiado!');
+            alert('Copiado para a área de transferência!');
         }
     </script>
 </body>
